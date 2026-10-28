@@ -1,0 +1,694 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ja"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="theme-color" content="#090d16" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;2000mエルゴDB・分析ダッシュボード&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg1:#090d16; --bg2:#0f172a; --text:#e5e7eb; --muted:#9ca3af;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--gold:#f59e0b; --cyan:#06b6d4; --line:rgba(255,255,255,.16);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color:var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>radial-gradient(900px 500px at 10% -10%, #11233f 0%, transparent 55%),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>radial-gradient(900px 500px at 110% 10%, #0d2d3a 0%, transparent 60%),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>linear-gradient(140deg,var(--bg1),var(--bg2));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height:100dvh;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.glass{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background:rgba(255,255,255,.07);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border:1px solid var(--line);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter:blur(14px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>-webkit-backdrop-filter:blur(14px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow:0 12px 30px rgba(0,0,0,.35);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.tab-btn.active{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background:linear-gradient(90deg, rgba(6,182,212,.22), rgba(245,158,11,.22));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color:rgba(255,255,255,.34);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color:#fff;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.pane{ opacity:0; transform:translateY(8px); pointer-events:none; height:0; overflow:hidden; transition:.28s ease; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.pane.show{ opacity:1; transform:translateY(0); pointer-events:auto; height:auto; overflow:visible; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi{ font-size:clamp(2rem,6vw,3.2rem); line-height:1; font-weight:900; letter-spacing:-.02em; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.input-dark{ background:rgba(5,10,22,.88)!important; color:#e5e7eb!important; border:1px solid rgba(255,255,255,.15)!important; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.input-dark::placeholder{ color:#718096; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.soft-scroll::-webkit-scrollbar{ width:10px; height:10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.soft-scroll::-webkit-scrollbar-thumb{ background:#334155; border-radius:9999px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.modal{ opacity:0; pointer-events:none; transition:opacity .25s; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.modal.open{ opacity:1; pointer-events:auto; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.modal-card{ transform:translateY(20px) scale(.98); opacity:0; transition:.25s; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.modal.open .modal-card{ transform:translateY(0) scale(1); opacity:1; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.timeline-line{ position:absolute; left:10px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.timeline-dot{ position:absolute; left:3px; top:16px; width:14px; height:14px; border-radius:9999px; background:var(--cyan); box-shadow:0 0 0 4px rgba(6,182,212,.2); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="max-w-7xl mx-auto px-3 sm:px-5 md:px-6 py-4 md:py-6 pb-24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;header class="glass rounded-2xl p-4 md:p-6 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h1 class="text-xl sm:text-2xl md:text-3xl font-black"&gt;2000mエルゴDB・分析ダッシュボード&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="text-slate-300 text-sm mt-1"&gt;全員リアルタイム共有（Firebase Firestore） / 自動学年繰り上がり（2026基準）&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="flex flex-wrap gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span id="cloudBadge" class="px-3 py-2 rounded-xl border border-cyan-500/60 bg-cyan-500/15 text-cyan-200 text-sm font-semibold"&gt;クラウド接続中...&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button id="btnSync" class="px-4 py-2 rounded-xl border border-amber-500/60 bg-amber-500/15 text-amber-200 font-semibold"&gt;クラウド同期&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;nav class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="tab-btn active glass rounded-xl px-3 py-3 font-semibold" data-tab="personal"&gt;個人分析&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="tab-btn glass rounded-xl px-3 py-3 font-semibold" data-tab="ranking"&gt;ランキング&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="tab-btn glass rounded-xl px-3 py-3 font-semibold" data-tab="chronology"&gt;年表&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="tab-btn glass rounded-xl px-3 py-3 font-semibold" data-tab="manage"&gt;入力管理&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/nav&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Personal --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="pane-personal" class="pane show"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="glass rounded-2xl p-4 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="text-xs text-slate-300"&gt;選手&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="personalAthlete" class="input-dark w-full md:w-96 rounded-xl px-3 py-3 mt-1"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="kpiGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-4"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="grid grid-cols-1 xl:grid-cols-2 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 class="font-bold mb-2"&gt;タイム推移（2000m / 500m）&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;canvas id="chartTime" height="130"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 class="font-bold mb-2"&gt;体重 &amp; IDT% 推移&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;canvas id="chartWI" height="130"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="glass rounded-2xl p-4 mt-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-bold mb-2"&gt;履歴&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="soft-scroll overflow-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;table class="min-w-full text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;thead&gt;&lt;tr class="border-b border-slate-700/70 text-slate-300"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-left"&gt;日付&lt;/th&gt;&lt;th class="p-2 text-left"&gt;イベント&lt;/th&gt;&lt;th class="p-2 text-left"&gt;タイム&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-left"&gt;500m&lt;/th&gt;&lt;th class="p-2 text-left"&gt;体重&lt;/th&gt;&lt;th class="p-2 text-left"&gt;IDT%&lt;/th&gt;&lt;th class="p-2 text-left"&gt;区分&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/tr&gt;&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;tbody id="historyBody"&gt;&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Ranking --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="pane-ranking" class="pane"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="glass rounded-2xl p-4 mb-4 grid grid-cols-2 md:grid-cols-6 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="text-xs text-slate-300"&gt;性別&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;select id="fGender" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="ALL"&gt;全体&lt;/option&gt;&lt;option value="M"&gt;男子&lt;/option&gt;&lt;option value="F"&gt;女子&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="text-xs text-slate-300"&gt;区分&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;select id="fStatus" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="ACTIVE"&gt;現役&lt;/option&gt;&lt;option value="ALL"&gt;歴代&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="text-xs text-slate-300"&gt;サイド&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;select id="fSide" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="ALL"&gt;全体&lt;/option&gt;&lt;option value="S"&gt;S&lt;/option&gt;&lt;option value="B"&gt;B&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="text-xs text-slate-300"&gt;ソート&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;select id="fSort" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="TIME"&gt;実タイム順&lt;/option&gt;&lt;option value="IDT"&gt;IDT%順&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="col-span-2 flex items-end"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="inline-flex items-center gap-2 text-sm"&gt;&lt;input id="fPB" type="checkbox" checked class="h-4 w-4 accent-cyan-400"&gt;個人ベストのみ&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="glass rounded-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="soft-scroll overflow-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;table class="min-w-[1120px] w-full text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;thead&gt;&lt;tr class="border-b border-slate-700/70 text-slate-300"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-left"&gt;順位&lt;/th&gt;&lt;th class="p-2 text-left"&gt;氏名&lt;/th&gt;&lt;th class="p-2 text-left"&gt;性別&lt;/th&gt;&lt;th class="p-2 text-left"&gt;区分&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-left"&gt;サイド&lt;/th&gt;&lt;th class="p-2 text-left"&gt;タイム&lt;/th&gt;&lt;th class="p-2 text-left"&gt;500m&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-left"&gt;体重&lt;/th&gt;&lt;th class="p-2 text-left"&gt;IDT%&lt;/th&gt;&lt;th class="p-2 text-left"&gt;日付&lt;/th&gt;&lt;th class="p-2 text-left"&gt;イベント&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/tr&gt;&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;tbody id="rankBody"&gt;&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Chronology --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="pane-chronology" class="pane"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="glass rounded-2xl p-4 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-bold"&gt;チーム年表（イベント単位）&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="text-sm text-slate-400 mt-1"&gt;平均タイム / 最高IDT% / 参加人数 / 新記録達成者&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="timeline" class="relative pl-8 space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="timeline-line"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Manage --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="pane-manage" class="pane"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="grid grid-cols-1 xl:grid-cols-3 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 class="font-bold mb-3"&gt;追加&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="openAthleteModal" class="w-full rounded-xl py-3 border border-cyan-500/60 bg-cyan-500/15 text-cyan-200 font-semibold"&gt;＋ 選手登録&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="openRecordModal" class="w-full rounded-xl py-3 border border-amber-500/60 bg-amber-500/15 text-amber-200 font-semibold"&gt;＋ 2000m記録登録&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="text-xs text-slate-400 mt-3"&gt;入部年度から2026年時点の回生を自動算出し、現役/OBを自動分類。&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4 xl:col-span-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 class="font-bold mb-2"&gt;全記録&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="soft-scroll overflow-auto max-h-[560px]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;table class="min-w-[1120px] w-full text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;thead&gt;&lt;tr class="border-b border-slate-700/70 text-slate-300"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;th class="p-2 text-left"&gt;日付&lt;/th&gt;&lt;th class="p-2 text-left"&gt;氏名&lt;/th&gt;&lt;th class="p-2 text-left"&gt;性別&lt;/th&gt;&lt;th class="p-2 text-left"&gt;区分&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;th class="p-2 text-left"&gt;サイド&lt;/th&gt;&lt;th class="p-2 text-left"&gt;体重&lt;/th&gt;&lt;th class="p-2 text-left"&gt;タイム&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;th class="p-2 text-left"&gt;500m&lt;/th&gt;&lt;th class="p-2 text-left"&gt;IDT%&lt;/th&gt;&lt;th class="p-2 text-left"&gt;イベント&lt;/th&gt;&lt;th class="p-2 text-left"&gt;操作&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/tr&gt;&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;tbody id="manageBody"&gt;&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Athlete Modal --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="athleteModal" class="modal fixed inset-0 z-50 bg-black/70 p-4 flex items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card glass rounded-2xl w-full max-w-xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex items-center justify-between mb-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-bold text-lg"&gt;選手登録&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button data-close="athleteModal" class="px-2 py-1 rounded border border-slate-600"&gt;✕&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;form id="athleteForm" class="grid grid-cols-1 md:grid-cols-2 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="md:col-span-2"&gt;&lt;label class="text-xs text-slate-300"&gt;氏名&lt;/label&gt;&lt;input name="name" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;性別&lt;/label&gt;&lt;select name="gender" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;&lt;option value="M"&gt;M&lt;/option&gt;&lt;option value="F"&gt;F&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;サイド&lt;/label&gt;&lt;select name="side" class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;&lt;option&gt;S&lt;/option&gt;&lt;option&gt;B&lt;/option&gt;&lt;option&gt;Both&lt;/option&gt;&lt;option&gt;COX&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;入部年度&lt;/label&gt;&lt;input name="entranceYear" type="number" min="2000" max="2100" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" value="2024" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;メモ&lt;/label&gt;&lt;input name="memo" class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="md:col-span-2 rounded-xl py-3 border border-cyan-500/60 bg-cyan-500/15 text-cyan-200 font-bold"&gt;保存&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Record Modal --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="recordModal" class="modal fixed inset-0 z-50 bg-black/70 p-4 flex items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card glass rounded-2xl w-full max-w-2xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex items-center justify-between mb-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-bold text-lg"&gt;2000m記録登録&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button data-close="recordModal" class="px-2 py-1 rounded border border-slate-600"&gt;✕&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;form id="recordForm" class="grid grid-cols-1 md:grid-cols-2 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;日付&lt;/label&gt;&lt;input name="date" type="date" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;イベント&lt;/label&gt;&lt;input name="event" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;選手&lt;/label&gt;&lt;select id="recordAthlete" name="athleteId" required class="input-dark w-full rounded-xl px-3 py-3 mt-1"&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;体重(kg)&lt;/label&gt;&lt;input name="weight" type="number" step="0.1" min="30" max="150" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;2000m（m:ss.s or 秒）&lt;/label&gt;&lt;input name="time" required class="input-dark w-full rounded-xl px-3 py-3 mt-1" placeholder="6:25.4 / 385.4" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label class="text-xs text-slate-300"&gt;メモ&lt;/label&gt;&lt;input name="memo" class="input-dark w-full rounded-xl px-3 py-3 mt-1" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="md:col-span-2 rounded-xl py-3 border border-amber-500/60 bg-amber-500/15 text-amber-200 font-bold"&gt;保存&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script type="module"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>import {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, getDocs, writeBatch</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ===== Firebase（部員は設定不要）=====</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 運用時はここをチームのFirebaseプロジェクト値に置き換えてください（部員側の設定は不要）</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const firebaseConfig = {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>apiKey: "REPLACE_WITH_YOUR_PUBLIC_API_KEY",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>authDomain: "REPLACE_WITH_YOUR_PROJECT.firebaseapp.com",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>projectId: "REPLACE_WITH_YOUR_PROJECT_ID",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>storageBucket: "REPLACE_WITH_YOUR_PROJECT.appspot.com",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>appId: "REPLACE_WITH_YOUR_APP_ID"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const CURRENT_YEAR = 2026;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const DB_NAME = "rowing_cloud_shared_v1";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const STORE_A = "athletes";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const STORE_R = "records";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let app, cloud, unsubAthletes = null, unsubRecords = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let chartTime = null, chartWI = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let athletes = [], records = [];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const $ = id =&gt; document.getElementById(id);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Utility ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const fmtDate = d =&gt; new Date(d + "T00:00:00").toLocaleDateString("ja-JP");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const fmtTime = sec =&gt; { const m=Math.floor(sec/60); const s=(sec-m*60).toFixed(1).padStart(4,"0"); return `${m}:${s}`; };</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const parseTime = v =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const t = String(v).trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(t.includes(":")){ const [m,s]=t.split(":"); return Number(m)*60+Number(s); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return Number(t);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const calcIDT = (gender, weight, actual) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const T100 = gender==="M" ? 359.6 : 405.0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const Wref = gender==="M" ? 72.0 : 57.0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return (T100 / (actual * Math.pow(weight/Wref, 2/9))) * 100;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const yearInfo = (entranceYear) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const y = CURRENT_YEAR - Number(entranceYear) + 1;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return (y&gt;=1 &amp;&amp; y&lt;=4) ? {status:"現役", yearLabel:`${y}回生`} : {status:"OB/OG", yearLabel:"OB/OG"};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sideMatch = (side, filter) =&gt; filter==="ALL" || side===filter || side==="Both";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function animateCount(el, to, formatter=(v)=&gt;v.toString(), duration=700){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const from = Number(el.dataset.last || 0), start = performance.now();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>function loop(t){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p = Math.min(1,(t-start)/duration), e = 1-Math.pow(1-p,3), v = from + (to-from)*e;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>el.textContent = formatter(v);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(p&lt;1) requestAnimationFrame(loop); else { el.textContent = formatter(to); el.dataset.last = String(to); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>requestAnimationFrame(loop);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- IndexedDB cache ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let idb;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openIDB(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new Promise((resolve,reject)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const req = indexedDB.open(DB_NAME, 1);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>req.onupgradeneeded = e =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const d = e.target.result;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if(!d.objectStoreNames.contains(STORE_A)) d.createObjectStore(STORE_A, {keyPath:"id"});</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if(!d.objectStoreNames.contains(STORE_R)) d.createObjectStore(STORE_R, {keyPath:"id"});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">        </span>req.onsuccess = ()=&gt;resolve(req.result);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>req.onerror = ()=&gt;reject(req.error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function idbGetAll(store){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new Promise((resolve,reject)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx=idb.transaction(store,"readonly"), req=tx.objectStore(store).getAll();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>req.onsuccess=()=&gt;resolve(req.result||[]); req.onerror=()=&gt;reject(req.error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function idbPut(store,val){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new Promise((resolve,reject)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx=idb.transaction(store,"readwrite");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.objectStore(store).put(val);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.oncomplete=()=&gt;resolve();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.onerror=()=&gt;reject(tx.error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function idbDelete(store,key){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new Promise((resolve,reject)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const tx=idb.transaction(store,"readwrite");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.objectStore(store).delete(key);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.oncomplete=()=&gt;resolve();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tx.onerror=()=&gt;reject(tx.error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Seed ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function seedIfEmptyCloud(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const aSnap = await getDocs(collection(cloud, "athletes"));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!aSnap.empty) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const seedAthletes = [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{id:crypto.randomUUID(),name:"山田 太郎",gender:"M",side:"S",entranceYear:2023,memo:""},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{id:crypto.randomUUID(),name:"佐藤 健",gender:"M",side:"B",entranceYear:2022,memo:""},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{id:crypto.randomUUID(),name:"高橋 美咲",gender:"F",side:"S",entranceYear:2023,memo:""},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{id:crypto.randomUUID(),name:"伊藤 彩",gender:"F",side:"B",entranceYear:2024,memo:""},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{id:crypto.randomUUID(),name:"中村 亮",gender:"M",side:"S",entranceYear:2018,memo:""},</p>
+<p class="p1"><span class="Apple-converted-space">      </span>];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const aid = Object.fromEntries(seedAthletes.map(x=&gt;[x.name,x.id]));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const seedRecords = [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2025-05-02","山田 太郎",72.1,372.8,"インカレ選考"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2026-03-08","山田 太郎",72.7,369.9,"春季2000TT"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2025-05-02","佐藤 健",71.2,382.1,"インカレ選考"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2026-03-08","佐藤 健",70.9,379.8,"春季2000TT"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2025-05-02","高橋 美咲",57.0,416.4,"インカレ選考"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2026-03-08","高橋 美咲",56.8,413.8,"春季2000TT"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2025-05-02","伊藤 彩",56.0,428.8,"インカレ選考"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2026-03-08","伊藤 彩",55.7,424.9,"春季2000TT"],</p>
+<p class="p1"><span class="Apple-converted-space">        </span>["2024-06-22","中村 亮",78.5,380.5,"OB合同TT"],</p>
+<p class="p1"><span class="Apple-converted-space">      </span>].map(x=&gt;({</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id:crypto.randomUUID(), athleteId:aid[x[1]], date:x[0], weight:x[2], timeInSeconds:x[3], event:x[4], memo:""</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const batch = writeBatch(cloud);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>seedAthletes.forEach(a=&gt;batch.set(doc(cloud,"athletes",a.id),a));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>seedRecords.forEach(r=&gt;batch.set(doc(cloud,"records",r.id),r));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>await batch.commit();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Cloud ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setCloudBadge(text, ok=true){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const b = $("cloudBadge");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>b.textContent = text;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>b.className = ok</p>
+<p class="p1"><span class="Apple-converted-space">        </span>? "px-3 py-2 rounded-xl border border-cyan-500/60 bg-cyan-500/15 text-cyan-200 text-sm font-semibold"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>: "px-3 py-2 rounded-xl border border-rose-500/60 bg-rose-500/15 text-rose-200 text-sm font-semibold";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function initCloud(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>app = initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cloud = getFirestore(app);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await seedIfEmptyCloud();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>unsubAthletes = onSnapshot(collection(cloud,"athletes"), async snap =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>athletes = snap.docs.map(d=&gt;d.data());</p>
+<p class="p1"><span class="Apple-converted-space">          </span>for(const a of athletes) await idbPut(STORE_A, a);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>refreshAll();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>unsubRecords = onSnapshot(collection(cloud,"records"), async snap =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>records = snap.docs.map(d=&gt;d.data());</p>
+<p class="p1"><span class="Apple-converted-space">          </span>for(const r of records) await idbPut(STORE_R, r);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>refreshAll();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>setCloudBadge("クラウド接続中（リアルタイム同期）", true);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch(e){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(e);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setCloudBadge("クラウド未接続（キャッシュ表示）", false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function syncNow(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Firestore onSnapshotが常時同期するため、ここでは再取得演出＋状態表示</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setCloudBadge("同期中...", true);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(()=&gt;setCloudBadge("クラウド接続中（リアルタイム同期）", true), 500);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Derived ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function enriched(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const amap = new Map(athletes.map(a=&gt;[a.id,a]));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return records.map(r=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const a = amap.get(r.athleteId);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!a) return null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const yi = yearInfo(a.entranceYear);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>...r,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>athleteName:a.name,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>gender:a.gender,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>side:a.side,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>status:yi.status,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>yearLabel:yi.yearLabel,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>split500:Number(r.timeInSeconds)/4,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>idt:calcIDT(a.gender, Number(r.weight), Number(r.timeInSeconds))</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}).filter(Boolean).sort((x,y)=&gt;new Date(x.date)-new Date(y.date));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Render ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderSelectors(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const options = athletes.slice().sort((a,b)=&gt;a.name.localeCompare(b.name,"ja")).map(a=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const yi=yearInfo(a.entranceYear);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `&lt;option value="${a.id}"&gt;${a.name} (${a.gender}/${a.side}/${yi.yearLabel})&lt;/option&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}).join("");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("personalAthlete").innerHTML = options;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("recordAthlete").innerHTML = options;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!$("personalAthlete").value &amp;&amp; athletes[0]) $("personalAthlete").value = athletes[0].id;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderPersonal(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const aid = $("personalAthlete").value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const arr = enriched().filter(r=&gt;r.athleteId===aid);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!arr.length){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>$("kpiGrid").innerHTML = `&lt;div class="glass rounded-2xl p-4"&gt;データがありません&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>$("historyBody").innerHTML = "";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(chartTime) chartTime.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(chartWI) chartWI.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const pbTime = arr.reduce((a,b)=&gt;a.timeInSeconds&lt;b.timeInSeconds?a:b);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const pbIdt = arr.reduce((a,b)=&gt;a.idt&gt;b.idt?a:b);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const latest = arr[arr.length-1];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const prev = arr.length&gt;1?arr[arr.length-2]:null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const dt = prev ? prev.timeInSeconds-latest.timeInSeconds : null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const dw = prev ? latest.weight-prev.weight : null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("kpiGrid").innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;&lt;p class="text-xs text-slate-300"&gt;2000m PB&lt;/p&gt;&lt;p class="kpi text-cyan-300"&gt;${fmtTime(pbTime.timeInSeconds)}&lt;/p&gt;&lt;p class="text-sm text-slate-400"&gt;500m: ${fmtTime(pbTime.split500)}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;&lt;p class="text-xs text-slate-300"&gt;IDT% PB&lt;/p&gt;&lt;p id="kpiIdt" class="kpi text-amber-300"&gt;${pbIdt.idt.toFixed(2)}%&lt;/p&gt;&lt;p class="text-sm text-slate-400"&gt;${fmtDate(pbIdt.date)}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;&lt;p class="text-xs text-slate-300"&gt;直近からの短縮&lt;/p&gt;&lt;p class="kpi ${dt===null?'text-slate-300':(dt&gt;=0?'text-emerald-300':'text-rose-300')}"&gt;${dt===null?'-':`${dt&gt;=0?'-':'+'}${Math.abs(dt).toFixed(1)}秒`}&lt;/p&gt;&lt;p class="text-sm text-slate-400"&gt;${prev?`${fmtDate(prev.date)} → ${fmtDate(latest.date)}`:'比較データ不足'}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="glass rounded-2xl p-4"&gt;&lt;p class="text-xs text-slate-300"&gt;体重変化&lt;/p&gt;&lt;p class="kpi ${dw===null?'text-slate-300':(dw&lt;=0?'text-emerald-300':'text-amber-300')}"&gt;${dw===null?'-':`${dw&gt;0?'+':''}${dw.toFixed(1)}kg`}&lt;/p&gt;&lt;p class="text-sm text-slate-400"&gt;最新 ${latest.weight.toFixed(1)}kg&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const kpiIdt = $("kpiIdt"); kpiIdt.dataset.last = "0"; animateCount(kpiIdt, Number(pbIdt.idt.toFixed(2)), v=&gt;`${v.toFixed(2)}%`, 900);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("historyBody").innerHTML = arr.slice().reverse().map(r=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;tr class="border-b border-slate-800/70"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${fmtDate(r.date)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.event}&lt;/td&gt;&lt;td class="p-2 font-semibold"&gt;${fmtTime(r.timeInSeconds)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${fmtTime(r.split500)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.weight.toFixed(1)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.idt.toFixed(2)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${r.status}${r.status==="現役"?`(${r.yearLabel})`:''}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`).join("");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const labels = arr.map(r=&gt;`${r.date.slice(2)} ${r.event}`);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const common = {responsive:true,plugins:{legend:{labels:{color:"#e5e7eb"}}},scales:{x:{ticks:{color:"#cbd5e1"},grid:{color:"rgba(148,163,184,.16)"}},y:{ticks:{color:"#cbd5e1"},grid:{color:"rgba(148,163,184,.16)"}}}};</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(chartTime) chartTime.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>chartTime = new Chart($("chartTime"), {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type:"line",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data:{labels,datasets:[</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{label:"2000m(秒)",data:arr.map(r=&gt;r.timeInSeconds),borderColor:"#06b6d4",tension:.3,pointRadius:3},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{label:"500m(秒)",data:arr.map(r=&gt;r.split500),borderColor:"#f59e0b",tension:.3,pointRadius:3}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>options:{...common,scales:{...common.scales,y:{ticks:{color:"#cbd5e1",callback:v=&gt;fmtTime(v)},grid:{color:"rgba(148,163,184,.16)"}}}}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(chartWI) chartWI.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>chartWI = new Chart($("chartWI"), {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type:"line",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data:{labels,datasets:[</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{label:"体重(kg)",data:arr.map(r=&gt;r.weight),yAxisID:"y1",borderColor:"#34d399",tension:.3,pointRadius:3},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{label:"IDT%",data:arr.map(r=&gt;r.idt),yAxisID:"y2",borderColor:"#f59e0b",tension:.3,pointRadius:3}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>options:{responsive:true,plugins:{legend:{labels:{color:"#e5e7eb"}}},scales:{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>x:{ticks:{color:"#cbd5e1"},grid:{color:"rgba(148,163,184,.16)"}},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>y1:{position:"left",ticks:{color:"#cbd5e1"},grid:{color:"rgba(148,163,184,.16)"}},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>y2:{position:"right",ticks:{color:"#cbd5e1"},grid:{drawOnChartArea:false}}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderRanking(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const gender=$("fGender").value, status=$("fStatus").value, side=$("fSide").value, sort=$("fSort").value, pb=$("fPB").checked;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let arr = enriched().filter(r=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(gender!=="ALL" &amp;&amp; r.gender!==gender) return false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(status==="ACTIVE" &amp;&amp; r.status!=="現役") return false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!sideMatch(r.side, side)) return false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return true;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(pb){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const m=new Map();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for(const r of arr){</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const p=m.get(r.athleteId);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if(!p) m.set(r.athleteId,r);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>else{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const better = sort==="TIME" ? r.timeInSeconds&lt;p.timeInSeconds : r.idt&gt;p.idt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(better) m.set(r.athleteId,r);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>arr=[...m.values()];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>arr.sort((a,b)=&gt;sort==="TIME" ? a.timeInSeconds-b.timeInSeconds : b.idt-a.idt);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("rankBody").innerHTML = arr.length ? arr.map((r,i)=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;tr class="border-b border-slate-800/70"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2 font-bold ${i&lt;3?'text-amber-300':''}"&gt;${i+1}&lt;/td&gt;&lt;td class="p-2 font-semibold"&gt;${r.athleteName}&lt;/td&gt;&lt;td class="p-2"&gt;${r.gender}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${r.status}${r.status==="現役"?`(${r.yearLabel})`:''}&lt;/td&gt;&lt;td class="p-2"&gt;${r.side}&lt;/td&gt;&lt;td class="p-2 text-cyan-300 font-bold"&gt;${fmtTime(r.timeInSeconds)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${fmtTime(r.split500)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.weight.toFixed(1)}&lt;/td&gt;&lt;td class="p-2 text-amber-300 font-bold"&gt;${r.idt.toFixed(2)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${fmtDate(r.date)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.event}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`).join("") : `&lt;tr&gt;&lt;td colspan="11" class="p-5 text-center text-slate-400"&gt;データなし&lt;/td&gt;&lt;/tr&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderChronology(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const arr = enriched();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const best = new Map(), breaker = new Map();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>arr.forEach(r=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const p=best.get(r.athleteId);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(p===undefined){ best.set(r.athleteId,r.timeInSeconds); breaker.set(r.id,false); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>else if(r.timeInSeconds&lt;p){ best.set(r.athleteId,r.timeInSeconds); breaker.set(r.id,true); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>else breaker.set(r.id,false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const g = new Map();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>arr.forEach(r=&gt;{ if(!g.has(r.event)) g.set(r.event,[]); g.get(r.event).push(r); });</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const cards = [...g.entries()].map(([event,list])=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>list.sort((a,b)=&gt;new Date(a.date)-new Date(b.date));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event, ds:list[0].date, de:list[list.length-1].date,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>avg:list.reduce((s,x)=&gt;s+x.timeInSeconds,0)/list.length,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>maxIdt:Math.max(...list.map(x=&gt;x.idt)),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>count:new Set(list.map(x=&gt;x.athleteId)).size,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>breakers:[...new Set(list.filter(x=&gt;breaker.get(x.id)).map(x=&gt;x.athleteName))]</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}).sort((a,b)=&gt;new Date(b.de)-new Date(a.de));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("timeline").innerHTML = `&lt;div class="timeline-line"&gt;&lt;/div&gt;` + (cards.length ? cards.map(c=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="timeline-dot"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="glass rounded-xl p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex flex-col md:flex-row md:justify-between gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;h4 class="font-bold text-cyan-300"&gt;${c.event}&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p class="text-xs text-slate-400"&gt;${fmtDate(c.ds)}${c.ds===c.de?'':' 〜 '+fmtDate(c.de)}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="glass rounded-lg p-3"&gt;&lt;p class="text-xs text-slate-400"&gt;平均タイム&lt;/p&gt;&lt;p class="font-bold"&gt;${fmtTime(c.avg)}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="glass rounded-lg p-3"&gt;&lt;p class="text-xs text-slate-400"&gt;最高IDT%&lt;/p&gt;&lt;p class="font-bold text-amber-300"&gt;${c.maxIdt.toFixed(2)}%&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="glass rounded-lg p-3"&gt;&lt;p class="text-xs text-slate-400"&gt;参加人数&lt;/p&gt;&lt;p class="font-bold"&gt;${c.count}名&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="glass rounded-lg p-3"&gt;&lt;p class="text-xs text-slate-400"&gt;新記録達成者&lt;/p&gt;&lt;p class="font-semibold ${c.breakers.length?'text-emerald-300':'text-slate-400'}"&gt;${c.breakers.length?c.breakers.join("、"):"なし"}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`).join("") : `&lt;div class="glass rounded-xl p-4"&gt;データなし&lt;/div&gt;`);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderManage(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const arr = enriched().sort((a,b)=&gt;new Date(b.date)-new Date(a.date));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("manageBody").innerHTML = arr.length ? arr.map(r=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;tr class="border-b border-slate-800/70"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${fmtDate(r.date)}&lt;/td&gt;&lt;td class="p-2"&gt;${r.athleteName}&lt;/td&gt;&lt;td class="p-2"&gt;${r.gender}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${r.status}${r.status==="現役"?`(${r.yearLabel})`:''}&lt;/td&gt;&lt;td class="p-2"&gt;${r.side}&lt;/td&gt;&lt;td class="p-2"&gt;${r.weight.toFixed(1)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2 font-semibold text-cyan-300"&gt;${fmtTime(r.timeInSeconds)}&lt;/td&gt;&lt;td class="p-2"&gt;${fmtTime(r.split500)}&lt;/td&gt;&lt;td class="p-2 font-semibold text-amber-300"&gt;${r.idt.toFixed(2)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${r.event}&lt;/td&gt;&lt;td class="p-2"&gt;&lt;button class="text-rose-300 underline" data-del="${r.id}"&gt;削除&lt;/button&gt;&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`).join("") : `&lt;tr&gt;&lt;td colspan="11" class="p-5 text-center text-slate-400"&gt;データなし&lt;/td&gt;&lt;/tr&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll("[data-del]").forEach(btn=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>btn.addEventListener("click", async ()=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if(!confirm("この記録を削除しますか？")) return;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>await deleteDoc(doc(cloud,"records",btn.dataset.del));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>await idbDelete(STORE_R, btn.dataset.del);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}catch(e){ alert("削除失敗: "+e.message); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function refreshAll(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderSelectors();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderPersonal();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderRanking();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderChronology();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderManage();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- UI ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setupTabs(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const tabs = [...document.querySelectorAll(".tab-btn")];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const panes = { personal:$("pane-personal"), ranking:$("pane-ranking"), chronology:$("pane-chronology"), manage:$("pane-manage") };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>tabs.forEach(t=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>t.addEventListener("click", ()=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>tabs.forEach(x=&gt;x.classList.remove("active"));</p>
+<p class="p1"><span class="Apple-converted-space">          </span>t.classList.add("active");</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Object.values(panes).forEach(p=&gt;p.classList.remove("show"));</p>
+<p class="p1"><span class="Apple-converted-space">          </span>panes[t.dataset.tab].classList.add("show");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const openModal=id=&gt;$(id).classList.add("open");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const closeModal=id=&gt;$(id).classList.remove("open");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function bindEvents(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setupTabs();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("personalAthlete").addEventListener("change", renderPersonal);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>["fGender","fStatus","fSide","fSort","fPB"].forEach(id=&gt;$(id).addEventListener("change", renderRanking));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("btnSync").addEventListener("click", syncNow);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("openAthleteModal").addEventListener("click", ()=&gt;openModal("athleteModal"));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("openRecordModal").addEventListener("click", ()=&gt;openModal("recordModal"));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll("[data-close]").forEach(b=&gt;b.addEventListener("click", ()=&gt;closeModal(b.dataset.close)));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>["athleteModal","recordModal"].forEach(id=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>$(id).addEventListener("click", e=&gt;{ if(e.target.id===id) closeModal(id); });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("athleteForm").addEventListener("submit", async e=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const fd = new FormData(e.target);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const athlete = {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id:crypto.randomUUID(),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>name:String(fd.get("name")).trim(),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>gender:fd.get("gender"),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>side:fd.get("side"),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>entranceYear:Number(fd.get("entranceYear")),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>memo:String(fd.get("memo")||"").trim()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!athlete.name){ alert("氏名を入力してください"); return; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await setDoc(doc(cloud,"athletes",athlete.id), athlete);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await idbPut(STORE_A, athlete);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>e.target.reset(); closeModal("athleteModal");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}catch(err){ alert("保存失敗: "+err.message); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>$("recordForm").addEventListener("submit", async e=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">        </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const fd = new FormData(e.target);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const sec = parseTime(fd.get("time"));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!Number.isFinite(sec) || sec&lt;=0){ alert("タイム形式が不正です"); return; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const rec = {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id:crypto.randomUUID(),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>athleteId:fd.get("athleteId"),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>date:fd.get("date"),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event:String(fd.get("event")).trim(),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>weight:Number(fd.get("weight")),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>timeInSeconds:Number(sec),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>memo:String(fd.get("memo")||"").trim()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await setDoc(doc(cloud,"records",rec.id), rec);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await idbPut(STORE_R, rec);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>e.target.reset(); closeModal("recordModal");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}catch(err){ alert("保存失敗: "+err.message); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ---------- Init ----------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function init(){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bindEvents();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>idb = await openIDB();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// 先にキャッシュ描画</p>
+<p class="p1"><span class="Apple-converted-space">      </span>athletes = await idbGetAll(STORE_A);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>records = await idbGetAll(STORE_R);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>refreshAll();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// クラウド接続</p>
+<p class="p1"><span class="Apple-converted-space">      </span>await initCloud();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>init();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
